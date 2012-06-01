@@ -33,7 +33,7 @@ use POSIX;
 my (%opt);
 
 if (!GetOptions(\%opt, 'help|?', 'version', 'list|l=s', 'database|d=s',
-    'section|s=s', 'output|o=s', 'quiet|q')) {
+    'section|s=s', 'output|o=s', 'quiet|q', 'round=f')) {
     pod2usage('exitval' => 1, 'verbose' => 0);
 } 
 
@@ -108,6 +108,11 @@ if ($opt{list}) {
             }
 
             my $hours = int(($activity->{time} / 60) * 100) / 100;
+	    
+	    if ($opt{round}) {
+		$hours = round_value_to_increment($hours, $opt{round});
+	    }
+
             $day_hours += $hours;
             $output .= sprintf("%-13s %5.2f    %s\n", $wr, $hours, $tags);
         }
@@ -141,6 +146,26 @@ else {
     print $output;
 
     exit 0;
+}
+
+sub round_value_to_increment {
+    my ($value, $increment) = @_;
+    
+    if ($increment <= 0) {
+	die "Please round to a positive value";
+    }
+
+    my $f = floor($value / $increment);
+    
+    my $rounded_down = $f * $increment;
+    my $rounded_up   = ($f + 1) * $increment;
+
+    if ($value - $rounded_down < $rounded_up - $value && $rounded_down != 0) {
+	return $rounded_down;
+    }
+    else {
+	return $rounded_up;
+    }
 }
 
 sub get_category_id_by_name {
@@ -185,6 +210,8 @@ EOTagSQL
 
     return $tags;
 }
+
+    
 
 sub get_activities_by_date {
     my ($dbh, $date, $cat_sql, $cat_id) = @_;
@@ -336,6 +363,16 @@ timesheet.
 Default is to print to standard output.
 
 =back
+
+=item B<--round=INCREMENT>
+
+Round each time value to the nearest INCREMENT, for example,
+--round=0.25 rounds all entries to the nearest quarter-hour. If
+rounding down would result in a time entry of 0.00, then it's
+rounded up.
+
+=back
+
 
 =head1 Setting defaults
 
