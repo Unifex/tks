@@ -1,3 +1,10 @@
+tks (1.0.14) unstable; urgency=low
+
+  * Add ability to round timesheet entries to a given time
+    value [Tom Eastman]
+
+ -- Matthew Hunt <matt@catalyst.net.nz>  Fri,  1 Jun 2012 14:56:30 +1200
+
 tks (1.0.13) maverick; urgency=low
 
   * Added rerun-timesheet program
