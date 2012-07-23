@@ -16,6 +16,8 @@ use URI;
 use Term::ProgressBar;
 use POSIX;
 
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+
 sub user_agent_string {
     my ($self) = @_;
 

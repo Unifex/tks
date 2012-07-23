@@ -1,3 +1,9 @@
+tks (1.0.15) unstable; urgency=low
+
+  * Don't verify the WRMS server SSL certificate.
+
+ -- Matthew Hunt <matt@catalyst.net.nz>  Tue, 24 Jul 2012 09:19:19 +1200
+
 tks (1.0.14) unstable; urgency=low
 
   * Add ability to round timesheet entries to a given time
