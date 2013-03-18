@@ -1,3 +1,9 @@
+tks (1.0.16) precise; urgency=low
+
+  * Minor update to allow timelist to work for EEC WRMS.
+
+ -- Matthew Hunt <matt@catalyst.net.nz>  Mon, 18 Mar 2013 22:02:18 +1300
+
 tks (1.0.15) unstable; urgency=low
 
   * Don't verify the WRMS server SSL certificate.
