@@ -121,8 +121,8 @@ sub _login {
         die "Login failed\n" . join("\n", map { " - $_" } @messages) . "\nStopped at ";
     }
 
-    my ($uncharged_work_link) = grep { $_->textContent eq 'My Uncharged Work' } $dom->findnodes('//a');
-    unless ( $uncharged_work_link and $uncharged_work_link->getAttribute('href') =~ /user_no=(\d+)/ ) {
+    my ($edit_details_link) = $dom->findnodes("//a[\@title='View and edit your account details']");
+    unless ( $edit_details_link and $edit_details_link->getAttribute('href') =~ /user_id=(\d+)/ ) {
         die "Couldn't determine WRMS user_no";
     }
 
@@ -360,6 +360,9 @@ sub valid_request {
     my ($self, $request) = @_;
 
     return 1 if $request =~ m{ \A \d+ \z }xms;
+
+    use Data::Dumper;
+    print STDERR 'Request appears to be invalid: ' . Dumper($request);
 
     return
 }
