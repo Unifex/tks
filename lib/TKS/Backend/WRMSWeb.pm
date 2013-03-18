@@ -223,21 +223,27 @@ sub get_timesheet_scrape {
     $self->fetch_page("form.php?f=timelist&user_no=$user&uncharged=1&from_date=" . $dates->mindate . "&to_date=" . $dates->maxdate);
 
     my $dom = $self->parse_page;
-    my ($table) = grep { $_->findnodes('./tr[1]/*')->size == 14 } $dom->findnodes('//table');
+    my $timelistfields = $self->instance_config('timelistfields');
+    $timelistfields ||= 14;
+
+    my ($table) = grep { $_->findnodes('./tr[1]/*')->size == $timelistfields } $dom->findnodes('//table');
 
     die "Couldn't find data table" unless $table;
 
     foreach my $row ( $table->findnodes('./tr') ) {
         my @data = map { $_->textContent } $row->findnodes('./td');
 
-        next unless $data[3] and $data[3] =~ m{ \A (\d\d)/(\d\d)/(\d\d\d\d) \z }xms;
+	my $timelistorgoffset = $self->instance_config('timelistorgoffset');
+        $timelistorgoffset ||= 0;
+
+        next unless $data[3 + $timelistorgoffset] and $data[3 + $timelistorgoffset] =~ m{ \A (\d\d)/(\d\d)/(\d\d\d\d) \z }xms;
 
         my $entry = {
             date         => "$3-$2-$1",
-            request      => $data[2],
-            comment      => $data[7],
-            time         => $data[4],
-            needs_review => $data[8],
+            request      => $data[2 + $timelistorgoffset],
+            comment      => $data[7 + $timelistorgoffset],
+            time         => $data[4 + $timelistorgoffset],
+            needs_review => $data[8 + $timelistorgoffset],
         };
 
         next unless $dates->contains($entry->{date});
