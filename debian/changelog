@@ -1,6 +1,8 @@
-tks (1.0.16) precise; urgency=low
+tks (1.0.16) unstable; urgency=low
 
-  * Minor update to allow timelist to work for EEC WRMS.
+  * Minor update to allow timelist to work for EEC WRMS. [Matthew Hunt]
+  * Fix for user number scrape from new-look WRMS pages. [Stephen Judd]
+  * Output request details when invalid request read. [Stephen Judd]
 
  -- Matthew Hunt <matt@catalyst.net.nz>  Mon, 18 Mar 2013 22:02:18 +1300
 
