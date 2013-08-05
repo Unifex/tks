@@ -51,6 +51,7 @@ EOF
     exit;
 }
 
+
 my $days  = 7; # how far back in time to we look?
 my $user  = `whoami`;
 my $help = 0;
@@ -58,7 +59,12 @@ my @paths = ('.');
 my $wr;
 my $ignore;
 my $starttime = 9; # What hour of the day do you start at?
+my $tz = 'EST'; # TODO strftime("%Z", localtime());
 chomp $user;
+
+#localtime();
+my ($std, $dst) = POSIX::tzname();
+print "$std $dst \n\n";
 
 GetOptions (
     "d|days=f"   => \$days,
@@ -167,8 +173,8 @@ sub ft {
 foreach my $commit (@commits){
 
     my @com = @$commit;
-    my $date = Date::Format::time2str("\n%Y-%m-%d # %A \n",$com[0], 'AEST');
-    my $time = Date::Format::time2str("%H:%M ",$com[0], 'AEST');
+    my $date = Date::Format::time2str("\n%Y-%m-%d # %A \n",$com[0], $tz);
+    my $time = Date::Format::time2str("%H:%M ",$com[0], $tz);
 
     if ($date ne $lastdate){
         if ($daytotal){
