@@ -101,6 +101,10 @@ sub findCommits {
         my $dud       = shift @res;
         my $msg       = substr(shift @res, 4);
            $dud       = shift @res;
+        if (substr($msg,0,6) eq 'Revert'){
+           $dud       = shift @res;
+           $dud       = shift @res;
+        }
 
         my @stuff = ($timestamp,$date,$msg,$branch,$commit, $system);
         push @commits, \@stuff; 
@@ -154,6 +158,9 @@ foreach my $commit (@commits){
 
     $time = substr($time,0,2) + substr($time,3,2)/60 ;
     my $delta = $time - $lasttime;
+    if ($delta < 0){
+        $delta = 1; # Most things take about an hour
+    }
     $daytotal += $delta;
 #    if ($delta == 0){ next; } # this collapses commits on two branches
     printf "%-15s%6.2f   %s (%s: %s)\n", $com[3], $delta, $com[2], $com[5], $com[4];
