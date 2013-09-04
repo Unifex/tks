@@ -205,7 +205,7 @@ git2tks - generates a TKS file from your git commit log(s)
 
 =head1 DESCRIPTION
 
-B<git2tks> is bundled with tks that allows you to use mostly just
+B<git2tks> is a utility bundled with tks that allows you to use mostly just
 git for time keeping. To do this it makes some assumptions like:
 
 =over 4
