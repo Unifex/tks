@@ -44,9 +44,8 @@ It will:
 > $cmd -d 14    # show 14 days (default to 7)
 > $cmd -s 8     # I start at 8am (default 9am)
 > $cmd -u jim   # Show someone else's data
-> $cmd -p repo  # Use a path instead of the current working dir
 
-See the man page for more details.
+See the man page for the rest of the option and more detail.
 
 EOF
     exit;
@@ -204,32 +203,28 @@ __END__
 
 git2tks - generates a TKS file from your git commit log(s)
 
-=head1 SYNOPSIS
-
-B<git2tks> [B<-h>]
-
-- display brief usage information
-
-B<git2tks> [B<-d> I<days>] [B<-s> I<starttime>] [B<-u> I<user>] [REPO-PATH(s)] 
-
 =head1 DESCRIPTION
 
-B<git2tks> is a utility included with tks that converts your git commit log
-into TKS records. To do this it makes some wild assumptions like:
+B<git2tks> is bundled with tks that allows you to use mostly just
+git for time keeping. To do this it makes some assumptions like:
 
-- you have only worked on one thing at a time
+=over 4
 
-- each time records starts from the most recent git commit time (even on another repo)
+=item * you have only worked on one thing at a time
 
-- if no previous commit that day, assumes 9am (time to read emails etc)
+=item * each time records starts from the most recent previous git commit timestamp (even on another repo)
 
-- if you commited something before the start of the day, defaults to 1 hour
+=item * if no previous commit that day, assumes you started at 9am
 
-- you haven't squashing of commits that would mess up the timestamps
+=item * if you commited something earlier than the start it defaults to 1 hour
 
-- you never take a break or eat lunch, or do anything except stuff in git
+=item * you haven't squashed commits or other rebasing that messes up the timestamps
 
-- your git timestamps are correct, ie your box and VM's etc have the right time
+=item * you never take a break or eat lunch, or do anything except stuff in git
+
+=item * your git timestamps are correct, ie your box and VM's etc have the right time
+
+=back
 
 Because of these assumptions it is intended that you review and massage the
 output before you save it via TKS into WRMS.
@@ -237,14 +232,14 @@ output before you save it via TKS into WRMS.
 =head1 MAPPING BRANCHES TO WR's
 
 In the project which inspired this (Open2Study) each release branch has a
-separate WR for each release. git2tks uses a tks sanitised version of the
-branch name as the tks WR alias, so you can set these up to map to WR's
-however you like using the [requestmap] in your .tksrc file:
+separate WR. So git2tks uses a sanitised version of the branch name as the
+tks WR alias, so you can set these up to map to WR's however you like using
+the [requestmap] feature in your .tksrc file, see the wiki for more details:
 
 https://wiki.wgtn.cat-it.co.nz/wiki/TKS#tksrc
 
 If you just want them all to be against a single WR number or alias you can
-use the B<--wr> option to override them.
+use the B<--wr> option to override this feature.
 
 =head1 SHARED COMMITS
 
@@ -264,15 +259,15 @@ turn them off with the B<--ignore> option.
 
 =over 4
 
-=item B<-h|--help>
+=item B<-h, --help>
 
-Show brief usage information for the program and exit.
+Show brief usage information
 
 =back
 
 =over 4
 
-=item B<-d|--days> I<days>
+=item B<-d, --days>=I<days>
 
 Specify how far back in time to look for commits. Default is 7
 
@@ -280,7 +275,7 @@ Specify how far back in time to look for commits. Default is 7
 
 =over 4
 
-=item B<-s|--start> I<starttime>
+=item B<-s, --start>=I<starttime>
 
 Specify a start time for each day, defaults to 9
 
@@ -288,7 +283,7 @@ Specify a start time for each day, defaults to 9
 
 =over 4
 
-=item B<-u|--user> I<user>
+=item B<-u, --user>=I<user>
 
 Show a timesheet for another user, must match what is in git
 
@@ -296,7 +291,7 @@ Show a timesheet for another user, must match what is in git
 
 =over 4
 
-=item B<-w|--wr> I<work-request>
+=item B<-w, --wr>=I<work-request>
 
 Use one WR number or alias for all entries
 
@@ -304,9 +299,9 @@ Use one WR number or alias for all entries
 
 =over 4
 
-=item B<-i|--ignore>
+=item B<-i, --ignore>
 
-Ignore commits which are duplicated across branche's
+Ignore commits which are duplicated across branch's
 
 =back
 
@@ -316,12 +311,12 @@ Ignore commits which are duplicated across branche's
 
 git2tks works if you are anywhere inside a git repo, or you can pass in
 multiple paths to various repos. If you pass multiple repo's it will 
-detect swapping work between them over the day.
+detect swapping working between them over the course of the day.
 
 git2tks /var/www/*
 
-For convenience it tries to find a nice short name for each repo as a suffix
-to the git hash so you can tell them apart.
+For convenience it uses the basename of the remote as a suffix
+for each git hash so you can tell them apart.
 
 =back
 
@@ -331,6 +326,6 @@ Brendan Heywood <brendan@catalyst-au.net>
 
 =head1 SEE ALSO
 
-http://wiki.wgtn.cat-it.co.nz/wiki/TKS
+http://wiki.wgtn.cat-it.co.nz/wiki/TKS#Use_git_to_track_your_time_with_git2tks
 
 =cut
