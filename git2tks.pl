@@ -63,7 +63,7 @@ EOF
 my $days  = 7; # how far back in time to we look?
 my $user  = `whoami`;
 my $help = 0;
-my $path = '.';
+my @paths = ('.');
 my $starttime = 10; # What hour of the day do you start at?
 chomp $user;
 
@@ -72,7 +72,6 @@ GetOptions (
     "d|days=f"   => \$days,
     "s|start=f"  => \$starttime,
     "u|user=s"   => \$user,
-    "p|path=s"   => \$path,
     "h|help"     => \$help,
 ) or die usage();
 
@@ -116,10 +115,17 @@ sub findCommits {
 sub findCommitsForRepo {
     my ($cwd, $system, $user, $days) = @_;
     my @coms;
-    my $remote = `git remote -v`;
+    my $remote = `git remote -v 2>&1`;
+
+    if ($remote =~ /fatal/){
+        # not a git repo
+        return;
+    }
+
     $remote =~ s/.*?\w+(.*)\(fetch.*/$1/gs;
     $remote = basename($remote);
     $remote =~ s/\.[^.]+$//;
+
     my @branches = split '\n', `git branch`;
     foreach my $branch (@branches){
         $branch = substr($branch,2);
@@ -128,9 +134,23 @@ sub findCommitsForRepo {
     return @coms;
 }
 
-chdir $path;
+my @commits;
 
-my @commits = findCommitsForRepo('.', 'moodle', $user, $days);
+if($#ARGV ne -1){
+    @paths = @ARGV;
+}
+
+my $basedir = getcwd();
+
+foreach my $path (@paths){
+    if ($path !~ /\//){
+        $path = $basedir.'/'.$path;
+    }
+    if (!-d $path){ next; }
+    print "Looking in $path \n";
+    chdir $path;
+    push @commits, findCommitsForRepo('.', 'moodle', $user, $days);
+}
 
 my $lastdate='';
 my $lasttime = $starttime;
@@ -179,7 +199,7 @@ __END__
 
 =head1 NAME
 
-git2tks - creates TKS files using details from your git commit log
+git2tks - generates a TKS file your git commit log(s)
 
 =head1 SYNOPSIS
 
@@ -187,9 +207,7 @@ B<git2tks> [B<-h>]
 
 - display brief usage information
 
-B<git2tks> [B<-s> I<days>] [B<-l> I<datespec>] [B<-s> I<section>] [B<-o> I<output file>]
-
-- attempts to create a TKS file using the parameters provided
+B<git2tks> [B<-d> I<days>] [B<-s> I<starttime>] [B<-u> I<user>] [REPO-PATH(s)] 
 
 =head1 DESCRIPTION
 
@@ -252,9 +270,16 @@ Show a timesheet for another user, must match what is in git
 
 =over 4
 
-=item B<-p> I<path>
+=item B<REPO-PATH(s)>
 
-Specifies a git repo path instead of the CWD
+git2tks works if you are anywhere inside a git repo, or you can pass in
+multiple paths to various repos. If you pass multiple repo's it will 
+detect swapping work between them over the day.
+
+git2tks /var/www/*
+
+For convenience it tries to find a nice short name for each repo as a suffix
+to the git hash so you can tell them apart.
 
 =back
 
