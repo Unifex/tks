@@ -21,7 +21,6 @@ our $VERSION = '1.0.0';
 
 use strict;
 use warnings;
-
 use Data::Dumper;
 use Date::Format ();
 use Date::Parse ();
@@ -57,14 +56,17 @@ my $days  = 7; # how far back in time to we look?
 my $user  = `whoami`;
 my $help = 0;
 my @paths = ('.');
+my $wr;
+my $ignore;
 my $starttime = 10; # What hour of the day do you start at?
 chomp $user;
-
 
 GetOptions (
     "d|days=f"   => \$days,
     "s|start=f"  => \$starttime,
     "u|user=s"   => \$user,
+    "w|wr=s"     => \$wr,
+    "i|ignore"   => \$ignore,
     "h|help"     => \$help,
 ) or die usage();
 
@@ -73,10 +75,8 @@ if( $help ){
     exit;
 }
 
-
-
 sub findCommits {
-    my ($cwd, $system, $branch, $user, $days) = @_;
+    my ($wr, $cwd, $system, $branch, $user, $days) = @_;
     my @commits;
     my $cmd = "git log --since=".$days.".days --author=$user $branch";
     my @res = split '\n', `$cmd`;
@@ -97,6 +97,9 @@ sub findCommits {
            $dud       = shift @res;
            $dud       = shift @res;
         }
+        if ($wr){
+            $branch = $wr;
+        }
 
         my @stuff = ($timestamp,$date,$msg,$branch,$commit, $system);
         push @commits, \@stuff;
@@ -104,9 +107,8 @@ sub findCommits {
     return @commits;
 }
 
-
 sub findCommitsForRepo {
-    my ($cwd, $system, $user, $days) = @_;
+    my ($wr, $cwd, $system, $user, $days) = @_;
     my @coms;
     my $remote = `git remote -v 2>&1`;
 
@@ -115,6 +117,7 @@ sub findCommitsForRepo {
         return;
     }
 
+    # Find a pretty repo name
     $remote =~ s/.*?\w+(.*)\(fetch.*/$1/gs;
     $remote = basename($remote);
     $remote =~ s/\.[^.]+$//;
@@ -122,7 +125,7 @@ sub findCommitsForRepo {
     my @branches = split '\n', `git branch`;
     foreach my $branch (@branches){
         $branch = substr($branch,2);
-        push @coms, findCommits('.', $remote, $branch, $user, $days);
+        push @coms, findCommits($wr, '.', $remote, $branch, $user, $days);
     }
     return @coms;
 }
@@ -142,14 +145,18 @@ foreach my $path (@paths){
     if (!-d $path){ next; }
     print "Looking in $path \n";
     chdir $path;
-    push @commits, findCommitsForRepo('.', 'moodle', $user, $days);
+    push @commits, findCommitsForRepo($wr, '.', 'moodle', $user, $days);
 }
 
 my $lastdate='';
 my $lasttime = $starttime;
 my $daytotal = 0;
 
-@commits = sort { $a->[0] <=> $b->[0] or $b->[3] cmp $a->[3] } @commits;
+@commits = sort {
+    $a->[0] <=> $b->[0] # sort by commit time
+    or
+    $a->[3] cmp $b->[3] # sort by name, eg release-2-1 is before release-2-1
+} @commits;
 
 sub ft {
     my ($hours) = @_;
@@ -179,7 +186,10 @@ foreach my $commit (@commits){
         $delta = 1; # Most things take about an hour
     }
     $daytotal += $delta;
-#    if ($delta == 0){ next; } # this collapses commits on two branches
+    if ($ignore && $delta == 0){
+        # this collapses commits on two branches
+        next;
+    }
     printf "%-15s%6.2f   %s (%s: %s)\n", $com[3], $delta, $com[2], $com[5], $com[4];
 
     $lastdate = $date;
@@ -209,29 +219,48 @@ records. To do this it makes some wild assumptions like:
 
 - you only work on one thing at a time
 
-- each time records starts from the most recent git commit time
+- each time records starts from the most recent git commit time (even on another repo)
 
 - if no previous commit that day, assumes 10am (time to read emails etc)
+
+- if you commited something before the start of the day, defaults to 1 hour
 
 - you haven't done much crazy squishing of commits
 
 - you never take a break or eat lunch, or do anything except stuff in git
 
-Because of these asumptions, you generally want to massage the output before
+Because of these asumptions, it is intended that review, massage the output before
 you save it via TKS into WRMS.
 
-In the project which inspired this (Open2Study) each release was on a branch
-and had a separate WR for each release. git2tks uses a tks sanitised version
-of the branch name as the tks WR alias, so you can set these up to map to 
-WR's however you like using the [requestmap] in your .tksrc file:
+=head1 MAPPING BRANCHES TO WR's
+
+In the project which inspired this (Open2Study) each release branch has a
+separate WR for each release. git2tks uses a tks sanitised version of the
+branch name as the tks WR alias, so you can set these up to map to WR's
+however you like using the [requestmap] in your .tksrc file:
 
 https://wiki.wgtn.cat-it.co.nz/wiki/TKS#tksrc
+
+If you just want them all to be against a single WR or WR use the B<-w> option.
+
+=head1 SHARED COMMITS
+
+If you have commits which are on multiple branches, only one of these will
+show up as zero time, so it won't get counted twice when importing into TKS.
+Both records are left there for convenience so you can swap them over.
+
+It attempts to find the 'earliest' branch as the one that gets the hours by
+default. If you use a branch naming convention like semver.org things should
+work out. Happily 'master' is before 'release-x-y' so it takes precendence.
+
+If you've got heaps of branches and the extra rows just add clutter, you can
+turn them off with the -d option.
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<-h>
+=item B<-h|--help>
 
 Show brief usage information for the program and exit.
 
@@ -239,7 +268,7 @@ Show brief usage information for the program and exit.
 
 =over 4
 
-=item B<-d> I<days>
+=item B<-d|--days> I<days>
 
 Specify how far back in time to look for commits. Default is 7
 
@@ -247,7 +276,7 @@ Specify how far back in time to look for commits. Default is 7
 
 =over 4
 
-=item B<-s> I<starttime>
+=item B<-s|--start> I<starttime>
 
 Specify a start time for each day, defaults to 10
 
@@ -255,9 +284,25 @@ Specify a start time for each day, defaults to 10
 
 =over 4
 
-=item B<-u> I<user>
+=item B<-u|--user> I<user>
 
 Show a timesheet for another user, must match what is in git
+
+=back
+
+=over 4
+
+=item B<-w|--wr> I<work-request>
+
+Use one WR number or alias for all entries
+
+=back
+
+=over 4
+
+=item B<-i|--ignore>
+
+Ignore commits which are duplicated across branche's
 
 =back
 
