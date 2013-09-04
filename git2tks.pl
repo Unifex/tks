@@ -38,11 +38,11 @@ It will:
   * pull data from all local branches, each duplicate commit will be present
     but with zero time (tks ignores it but here so you could use it instead)
   * branch names are sanitized and become your .tksrc WR aliases
-  * Assumes we start useful work at 10am (emails etc should be a separate WR record)
+  * Assumes we start useful work at 9am (emails etc should be a separate WR record)
   * Is generally a starting point, entries should be sanitised before use
 
 > $cmd -d 14    # show 14 days (default to 7)
-> $cmd -s 8     # I start at 8am (default 10am)
+> $cmd -s 8     # I start at 8am (default 9am)
 > $cmd -u jim   # Show someone else's data
 > $cmd -p repo  # Use a path instead of the current working dir
 
@@ -58,7 +58,7 @@ my $help = 0;
 my @paths = ('.');
 my $wr;
 my $ignore;
-my $starttime = 10; # What hour of the day do you start at?
+my $starttime = 9; # What hour of the day do you start at?
 chomp $user;
 
 GetOptions (
@@ -143,7 +143,7 @@ foreach my $path (@paths){
         $path = $basedir.'/'.$path;
     }
     if (!-d $path){ next; }
-    print "Looking in $path \n";
+    print "# Looking in $path \n";
     chdir $path;
     push @commits, findCommitsForRepo($wr, '.', 'moodle', $user, $days);
 }
@@ -202,7 +202,7 @@ __END__
 
 =head1 NAME
 
-git2tks - generates a TKS file your git commit log(s)
+git2tks - generates a TKS file from your git commit log(s)
 
 =head1 SYNOPSIS
 
@@ -214,23 +214,25 @@ B<git2tks> [B<-d> I<days>] [B<-s> I<starttime>] [B<-u> I<user>] [REPO-PATH(s)]
 
 =head1 DESCRIPTION
 
-B<git2tks> is a utility that converts your git commit log into TKS
-records. To do this it makes some wild assumptions like:
+B<git2tks> is a utility included with tks that converts your git commit log
+into TKS records. To do this it makes some wild assumptions like:
 
-- you only work on one thing at a time
+- you have only worked on one thing at a time
 
 - each time records starts from the most recent git commit time (even on another repo)
 
-- if no previous commit that day, assumes 10am (time to read emails etc)
+- if no previous commit that day, assumes 9am (time to read emails etc)
 
 - if you commited something before the start of the day, defaults to 1 hour
 
-- you haven't done much crazy squishing of commits
+- you haven't squashing of commits that would mess up the timestamps
 
 - you never take a break or eat lunch, or do anything except stuff in git
 
-Because of these asumptions, it is intended that review, massage the output before
-you save it via TKS into WRMS.
+- your git timestamps are correct, ie your box and VM's etc have the right time
+
+Because of these assumptions it is intended that you review and massage the
+output before you save it via TKS into WRMS.
 
 =head1 MAPPING BRANCHES TO WR's
 
@@ -241,20 +243,22 @@ however you like using the [requestmap] in your .tksrc file:
 
 https://wiki.wgtn.cat-it.co.nz/wiki/TKS#tksrc
 
-If you just want them all to be against a single WR or WR use the B<-w> option.
+If you just want them all to be against a single WR number or alias you can
+use the B<--wr> option to override them.
 
 =head1 SHARED COMMITS
 
 If you have commits which are on multiple branches, only one of these will
-show up as zero time, so it won't get counted twice when importing into TKS.
-Both records are left there for convenience so you can swap them over.
+show up with the correct time, the rest will have a time record of 0. This
+is so it won't get counted twice when importing into TKS. Both records are
+left there for convenience so you can swap them over.
 
 It attempts to find the 'earliest' branch as the one that gets the hours by
 default. If you use a branch naming convention like semver.org things should
 work out. Happily 'master' is before 'release-x-y' so it takes precendence.
 
 If you've got heaps of branches and the extra rows just add clutter, you can
-turn them off with the -d option.
+turn them off with the B<--ignore> option.
 
 =head1 OPTIONS
 
@@ -278,7 +282,7 @@ Specify how far back in time to look for commits. Default is 7
 
 =item B<-s|--start> I<starttime>
 
-Specify a start time for each day, defaults to 10
+Specify a start time for each day, defaults to 9
 
 =back
 
