@@ -18,13 +18,6 @@
 #
 
 our $VERSION = '1.0.0';
-#
-# TODO LIST
-#
-# * Fail nicely if not in a git repo 
-# * Config it to run across multiple repos
-#
-
 
 use strict;
 use warnings;
@@ -39,7 +32,7 @@ sub usage {
     use File::Basename;
     my $cmd = basename($0);
     print <<EOF;
-Converts your git commits into TKS format
+Converts your git commit logs into TKS format
 
 It will:
   * pull data from current repo
@@ -47,14 +40,14 @@ It will:
     but with zero time (tks ignores it but here so you could use it instead)
   * branch names are sanitized and become your .tksrc WR aliases
   * Assumes we start useful work at 10am (emails etc should be a separate WR record)
+  * Is generally a starting point, entries should be sanitised before use
 
 > $cmd -d 14    # show 14 days (default to 7)
 > $cmd -s 8     # I start at 8am (default 10am)
 > $cmd -u jim   # Show someone else's data
 > $cmd -p repo  # Use a path instead of the current working dir
 
-Caveats:
-  * Is generally a starting point, entries should be sanitised before use
+See the man page for more details.
 
 EOF
     exit;
@@ -106,7 +99,7 @@ sub findCommits {
         }
 
         my @stuff = ($timestamp,$date,$msg,$branch,$commit, $system);
-        push @commits, \@stuff; 
+        push @commits, \@stuff;
     }
     return @commits;
 }
