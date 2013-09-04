@@ -167,7 +167,7 @@ sub ft {
 foreach my $commit (@commits){
 
     my @com = @$commit;
-    my $date = Date::Format::time2str("\n%Y-%m-%d # %A \n",$com[0], 'GMT');
+    my $date = Date::Format::time2str("\n%Y-%m-%d # %A \n",$com[0], 'AEST');
     my $time = Date::Format::time2str("%H:%M ",$com[0], 'AEST');
 
     if ($date ne $lastdate){
