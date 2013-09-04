@@ -116,10 +116,14 @@ sub findCommits {
 sub findCommitsForRepo {
     my ($cwd, $system, $user, $days) = @_;
     my @coms;
+    my $remote = `git remote -v`;
+    $remote =~ s/.*?\w+(.*)\(fetch.*/$1/gs;
+    $remote = basename($remote);
+    $remote =~ s/\.[^.]+$//;
     my @branches = split '\n', `git branch`;
     foreach my $branch (@branches){
         $branch = substr($branch,2);
-        push @coms, findCommits('.', 'moodle', $branch, $user, $days);
+        push @coms, findCommits('.', $remote, $branch, $user, $days);
     }
     return @coms;
 }
