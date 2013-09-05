@@ -228,7 +228,11 @@ git for time keeping. To do this it makes some assumptions like:
 
 =item * you never take a break or eat lunch, or do anything except stuff in git
 
-=item * your git timestamps are correct, ie your box and VM's etc have the right time
+=item * your git timestamps are correct, ie your box and VM's etc have the
+right time. WARNING: Because of the way "git log --since=x.days" works, if
+your system clock is wrong you can not only mess up your timesheets but also
+everyone else's.
+
 
 =back
 
