@@ -1,7 +1,7 @@
 Source: tks
 Section: utils
 Priority: optional
-Maintainer: Nigel McNie <nigel@catalyst.net.nz>
+Maintainer: Matthew Hunt <matt@catalyst.net.nz>
 Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.3
 Homepage: http://wiki.wgtn.cat-it.co.nz/wiki/TKS
