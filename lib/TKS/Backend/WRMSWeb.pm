@@ -121,8 +121,11 @@ sub _login {
         die "Login failed\n" . join("\n", map { " - $_" } @messages) . "\nStopped at ";
     }
 
-    my ($edit_details_link) = $dom->findnodes("//a[\@title='View and edit your account details']");
-    unless ( $edit_details_link and $edit_details_link->getAttribute('href') =~ /user_id=(\d+)/ ) {
+    # Get the whoami page to get user number
+    $self->fetch_page('whoami.php');
+
+    my $content = $mech->content(format => 'text');
+    unless ( $content =~ /USERID:(\d+)/ ) {
         die "Couldn't determine WRMS user_no";
     }
 
