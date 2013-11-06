@@ -364,6 +364,8 @@ Default is to print to standard output.
 
 =back
 
+=over 4
+
 =item B<--round=INCREMENT>
 
 Round each time value to the nearest INCREMENT, for example,
