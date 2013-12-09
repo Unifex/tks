@@ -15,6 +15,7 @@ use TKS::Timesheet;
 use URI;
 use Term::ProgressBar;
 use POSIX;
+use Data::Dumper;
 
 $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
 
@@ -205,9 +206,20 @@ sub user_search {
 }
 
 sub get_timesheet_scrape {
-    my ($self, $dates, $user) = @_;
+    my ($self, $dates, $user, $dateformat) = @_;
 
     $dates = TKS::Date->new($dates);
+
+    # Default date format for timesheet scraping is YYYY-MM-DD
+    $dateformat ||= 'YMD';
+    my $dateformat_re = qr{ \A (\d\d\d\d)-(\d\d)-(\d\d) \z }xms;
+
+    if ($dateformat eq 'MDY' || $dateformat eq 'DMY') {
+        $dateformat_re = qr{ \A (\d\d)/(\d\d)/(\d\d\d\d) \z }xms;
+    }
+    elsif ($dateformat eq 'DMonY') {
+        $dateformat_re = qr{ \A (\d\d)\s(\w\w\w)\s(\d\d\d\d) \z }xms;
+    }
 
     my $timesheet = TKS::Timesheet->new();
 
@@ -239,10 +251,21 @@ sub get_timesheet_scrape {
 	my $timelistorgoffset = $self->instance_config('timelistorgoffset');
         $timelistorgoffset ||= 0;
 
-        next unless $data[3 + $timelistorgoffset] and $data[3 + $timelistorgoffset] =~ m{ \A (\d\d)/(\d\d)/(\d\d\d\d) \z }xms;
+        next unless $data[3 + $timelistorgoffset] and $data[3 + $timelistorgoffset] =~ m/$dateformat_re/;
+        my $date = "$1-$2-$3";
+        if ($dateformat eq 'DMonY') {
+            my %monthnum = ('Jan' => 1, 'Feb' => 2, 'Mar' => 3, 'Apr' => 4, 'May' => 5, 'Jun' => 6, 'Jul' => 7, 'Aug' => 8, 'Sep' => 9, 'Oct' => 10, 'Nov' => 11, 'Dec' => 12);
+            $date = "$3-$monthnum{$2}-$1";
+        }
+        elsif ($dateformat eq 'DMY') {
+            $date = "$3-$2-$1";
+        }
+        elsif ($dateformat eq 'MDY') {
+            $date = "$3-$1-$2";
+        }
 
         my $entry = {
-            date         => "$3-$2-$1",
+            date         => $date,
             request      => $data[2 + $timelistorgoffset],
             comment      => $data[7 + $timelistorgoffset],
             time         => $data[4 + $timelistorgoffset],
@@ -265,10 +288,16 @@ sub get_timesheet_scrape {
 }
 
 sub get_timesheet {
-    my ($self, $dates, $user) = @_;
+    my ($self, $dates, $user, $dateformat) = @_;
 
     if ( $user ) {
-        return $self->get_timesheet_scrape($dates, $user);
+        # Config file date format is used only if not given on commandline
+        if (!defined($dateformat)) {
+            $dateformat = $self->instance_config('dateformat');
+        }
+        # Default date format is now YMD
+        $dateformat ||= 'YMD';
+        return $self->get_timesheet_scrape($dates, $user, $dateformat);
     }
 
     $dates = TKS::Date->new($dates);
@@ -364,7 +393,6 @@ sub valid_request {
 
     return 1 if $request =~ m{ \A \d+ \z }xms;
 
-    use Data::Dumper;
     print STDERR 'Request appears to be invalid: ' . Dumper($request);
 
     return

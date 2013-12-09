@@ -1,3 +1,9 @@
+tks (1.0.20) unstable; urgency=low
+
+  * Support for different date formats when reporting time for other users
+
+ -- Matthew Hunt <matt@catalyst.net.nz>  Mon, 09 Dec 2013 12:54:18 +1300
+
 tks (1.0.19) unstable; urgency=low
 
   * Minor POD fix.

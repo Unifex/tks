@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.20';
 
 use strict;
 use warnings;
@@ -32,13 +32,18 @@ use Term::ANSIColor;
 
 my(%opt);
 
-if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'quiet|q')) {
+if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'quiet|q', 'dateformat|d=s')) {
     pod2usage(-exitval => 1,  -verbose => 0);
 }
 
 pod2usage(-exitstatus => 0, -verbose => 1) if $opt{help};
 if ( $opt{version} ) {
     print "tks version $VERSION\n";
+    exit 0;
+}
+elsif ($opt{dateformat} && $opt{dateformat} !~ m/^(YMD|DMY|MDY|DMonY)$/)
+{
+    print "Invalid date format selected.\nValid formats are YMD, DMY, MDY and DMonY\n";
     exit 0;
 }
 
@@ -81,7 +86,7 @@ elsif ( $opt{list} ) {
     if ( $opt{filename} ) {
         pod2usage(-verbose => 0, -exitval => 1, -message => "using --list with a filename is not supported");
     }
-    my $timesheet = $backend->get_timesheet(TKS::Date->new($opt{list}), $opt{user});
+    my $timesheet = $backend->get_timesheet(TKS::Date->new($opt{list}), $opt{user}, $opt{dateformat});
     ts_print($timesheet);
 }
 elsif ( $opt{edit} ) {
@@ -209,6 +214,22 @@ supports it)
 
 Do not display any progress or timesheet messages when committing
 timesheet (for using TKS from cron).
+
+=item B<--dateformat> I<dateformat>
+
+When the --user option is specified, use the specified date format for
+parsing dates returned from the WRMS timesheet report.  This depends on
+the selected timeformat for your user account in WRMS.  Valid values are
+
+ YMD (dates in the form YYYY-MM-DD) [default if not specified]
+ DMY (dates in the form DD/MM/YYYY)
+ MDY (dates in the form MM/DD/YYYY)
+ DMonY (dates in the form DD Mon YYYY)
+
+This can also be specified in the configuration file on a per-instance
+basis using the key 'dateformat'.
+
+If set, the command-line setting will override the configuration file.
 
 =back
 
