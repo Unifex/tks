@@ -374,10 +374,11 @@ sub add_timesheet {
         #print "Post: $data\n";
         #next;
 
-        $self->{mech}->post($self->baseurl . 'api.php/times/record', Content => $data);
+        eval { $self->{mech}->post($self->baseurl . 'api.php/times/record', Content => $data); };
         # method returns "old" hours
-        unless ( $self->{mech}->content =~ m{ \A [\d.]+ \z }xms ) {
-            die "Error committing time for request " . $entry->request . ": '" . $self->{mech}->content . "'";
+        if ( $self->{mech}->status != '200' || $self->{mech}->content !~ m{ \A [\d.]+ \z }xms ) {
+            print STDERR "\n";
+            die "Error committing time for request " . $entry->request . ": '" . $self->{mech}->response->decoded_content . "'";
         }
         if ( $show_progress ) {
             $show_progress->update(++$count);

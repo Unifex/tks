@@ -1,3 +1,9 @@
+tks (1.0.22) unstable; urgency=low
+
+  * Improved reporting of errors returned by API
+
+ -- Robin Sheat <robin@catalyst.net.nz>  Wed, 15 Jan 2014 15:59:17 +1300
+
 tks (1.0.21) unstable; urgency=low
 
   * Remove requirement for access to abelard by using python API

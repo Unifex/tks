@@ -70,6 +70,7 @@ if ( config($opt{section}, 'case-insensitive') ) {
     $TKS::Timesheet::CASE_INSENSITIVE_REQUEST_MAP = 1;
 }
 
+my $color_on = ( -t STDOUT and not $opt{'no-color'} );
 if ( $opt{template} ) {
     my $timesheet = TKS::Timesheet->new();
     map {
@@ -96,13 +97,18 @@ elsif ( $opt{edit} ) {
     my $timesheet = $backend->get_timesheet(TKS::Date->new($opt{edit}));
     my $new_timesheet = $timesheet->edit();
 
-    if ( $new_timesheet ) {
-        my $diff = $timesheet->diff($new_timesheet);
-        $backend->add_timesheet($diff);
-        ts_print($new_timesheet);
-    }
-    else {
-        print "Timesheet wasn't saved, no modifications made\n";
+    eval {
+        if ( $new_timesheet ) {
+            my $diff = $timesheet->diff($new_timesheet);
+            $backend->add_timesheet($diff);
+            ts_print($new_timesheet);
+        }
+        else {
+            print "Timesheet wasn't saved, no modifications made\n";
+        }
+    };
+    if ($@) {
+        error_and_die($@);
     }
 }
 else {
@@ -123,20 +129,22 @@ else {
         my $existing = $backend->get_timesheet($timesheet->dates);
         my $diff = $existing->diff($timesheet);
         if ( $diff->entries ) {
-            if ( $opt{quiet} ) {
-                $backend->add_timesheet($diff, 0);
-            }
-            else {
-                print STDERR "Committing ...\n";
-                $backend->add_timesheet($diff, 1);
-            }
+            eval {
+                if ( $opt{quiet} ) {
+                    $backend->add_timesheet($diff, 0);
+                }
+                else {
+                    print STDERR "Committing ...\n";
+                    $backend->add_timesheet($diff, 1);
+                }
+            };
+            error_and_die($@) if $@;
         }
         else {
             print STDERR "No changes, nothing to commit\n";
         }
     }
     if ( $filter_warning ) {
-        my $color_on = ( -t STDOUT and not $opt{'no-color'} );
         printf
             "\n%swarning:%s %0.2f hours in your file %s%s%s fell outside the datespec %s%s%s and were not %s\n\n",
             $color_on ? color('bold red') : '',
@@ -164,6 +172,13 @@ sub ts_print {
     }
 }
 
+sub error_and_die {
+    # Uh oh
+    print STDERR color 'bold red';
+    print STDERR shift . "\n";
+    print STDERR color 'reset';
+    die "\n";
+}
 
 exit 0;
 
