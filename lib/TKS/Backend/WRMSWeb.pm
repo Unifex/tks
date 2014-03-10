@@ -95,7 +95,7 @@ sub _login {
         die "Missing username and/or password";
     }
 
-    print STDERR "Attemping login to WRMS as $username\n";
+    print STDERR "Attempting login to WRMS as $username\n";
 
     # Check for login form
     unless (
