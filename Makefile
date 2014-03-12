@@ -14,6 +14,6 @@ docs:
 	rst2html doc/spec/tks-functional-spec.rst doc/spec/tks-functional-spec.html
 
 test:
-	prove t
+	prove -Ilib t
 
 .PHONY: build

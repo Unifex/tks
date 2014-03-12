@@ -1,3 +1,10 @@
+tks (1.0.23) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * - add tksweb-commit script into package 
+
+ -- Evan Giles <evan@catalyst.net.nz>  Thu, 13 Mar 2014 10:35:03 +1300
+
 tks (1.0.22) unstable; urgency=low
 
   * Improved reporting of errors returned by API
