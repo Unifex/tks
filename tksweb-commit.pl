@@ -24,6 +24,17 @@ sub downloadFromTksweb {
     system($cmd);
 }
  
+sub validate_tks_file {
+    my($dir, $date) = @_;
+
+    open my $fh, '<', "$dir/$date.tks";
+    while(<$fh>) {
+        if(my($comment) = /^#[?]{5}\s+(.*)$/) {
+            die "$date: activity missing WR-number ($comment)\n";
+        }
+    }
+}
+
 sub commitOneDay {
     my ($date) = @_;
  
@@ -34,6 +45,7 @@ sub commitOneDay {
     close($fh);
  
     downloadFromTksweb($path, $date, $apikey);
+    validate_tks_file($path, $date);
     uploadToWrms($path, $date);
 }
  

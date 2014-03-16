@@ -1,3 +1,10 @@
+tks (1.0.24) unstable; urgency=low
+
+  * Make TKSWEB silent - but only if the output isn't to a terminal
+  * Validate the TKS file (TKSWEB dies if there is no WR)
+
+ -- Evan Giles <evan@catalyst.net.nz>  Mon, 17 Mar 2014 07:42:54 +1300
+
 tks (1.0.23) unstable; urgency=low
 
   * Non-maintainer upload.

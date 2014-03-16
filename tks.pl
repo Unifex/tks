@@ -141,7 +141,7 @@ else {
             error_and_die($@) if $@;
         }
         else {
-            print STDERR "No changes, nothing to commit\n";
+            !$opt{quiet} && print STDERR "No changes, nothing to commit\n";
         }
     }
     if ( $filter_warning ) {
