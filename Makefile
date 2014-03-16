@@ -2,7 +2,7 @@ all: build
 
 clean:
 	fakeroot make -f debian/rules clean
-	rm doc/spec/*.html
+	rm -f doc/spec/*.html
 
 build:
 	dpkg-buildpackage -rfakeroot -us -uc -b -tc

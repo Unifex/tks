@@ -9,13 +9,14 @@ use POSIX qw(strftime);
 sub uploadToWrms {
     my ($dir, $date) = @_;
  
-    system("tks -c $dir/$date.tks");
+    my $quiet = -t 1 ? "" : "-q";
+    system("tks $quiet -c $dir/$date.tks");
 }
  
 sub downloadFromTksweb {
     my ($dir, $date, $apikey) = @_;
  
-    print "Committing for $date\n";
+    print "Committing for $date\n" if -t 1;
  
     my $url = "https://tksweb.catalyst.net.nz/export/catalyst/$date.tks";
     my $cmd = "wget -q -O - --post-data='api-key=$apikey' $url > $dir/$date.tks";
