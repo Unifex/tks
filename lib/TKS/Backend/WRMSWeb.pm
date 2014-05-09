@@ -74,6 +74,7 @@ sub fetch_page {
 
     if ( $mech->form_with_fields('username', 'password') ) {
         $self->_login;
+        $mech->get(URI->new_abs($url, $self->baseurl));
     }
 }
 
@@ -175,7 +176,7 @@ sub user_search {
             my @data = map { $_->textContent } $row->findnodes('./td');
 
             next unless $data[$org ? 3 : 4] and $data[$org ? 3 : 4] =~ m{ (\d\d)/(\d\d)/(\d\d\d\d) }xms;
-            next unless $row->findvalue('./td[1]//a/@href') =~ m{ \b user_no = (\d+) \b }xms;
+            next unless $row->findvalue('./td[1]//a/@href') =~ m{ \b user/(\d+) \b }xms;
 
             push @{$self->{user_cache}}, {
                 user_no   => $1,

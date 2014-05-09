@@ -1,3 +1,9 @@
+tks (1.0.25) unstable; urgency=low
+
+  * Updated user_search scraping for the new-style WRMS user URLs
+
+ -- Grant Patterson <grant.patterson@catalyst.net.nz>  Fri, 09 May 2014 15:15:36 +1200
+
 tks (1.0.24) unstable; urgency=low
 
   * Make TKSWEB silent - but only if the output isn't to a terminal
