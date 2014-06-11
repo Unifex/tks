@@ -32,7 +32,7 @@ use Term::ANSIColor;
 
 my(%opt);
 
-if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'quiet|q', 'dateformat|d=s', 'query|q=s', 'maxquery=i')) {
+if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'quiet|q', 'dateformat|d=s', 'query=s', 'maxquery=i')) {
     pod2usage(-exitval => 1,  -verbose => 0);
 }
 
