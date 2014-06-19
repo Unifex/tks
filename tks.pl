@@ -98,6 +98,10 @@ elsif ( $opt{edit} ) {
     }
     my $timesheet = $backend->get_timesheet(TKS::Date->new($opt{edit}));
 
+    map {
+        $timesheet->addmentioneddate($_);
+    } TKS::Date->new($opt{edit})->dates;
+
     my $prelude = '';
     if ( $opt{query} ) {
         my $maxrows = $opt{maxquery} || 15;
