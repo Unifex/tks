@@ -51,8 +51,8 @@ sub html2text {
             if ($val =~ /\d+\.\d+/){
                 $val = sprintf('%.2f', $val * 1);
                 $val = sprintf('%7s', $val);
-            } elsif ($val =~ /^\d$/){
-                $val .= "   ";
+            } elsif ($val =~ /^\d+$/){
+                $val .= '   ';
                 $val = sprintf('%7s', $val);
             }
             $data[$row][$col] = $val;
@@ -128,7 +128,7 @@ sub html2text {
         my ($str, $w, $ell) = @_;
         if (length($str) > $w){
             if ($ell){
-                $str = substr($str, 0, $w-3).'...';
+                $str = substr($str, 0, $w-2).'..';
                 return sprintf("%-".$w."s", $str);
             } else {
                 $str = substr($str, 0, $w);
