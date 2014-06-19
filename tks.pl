@@ -113,7 +113,7 @@ elsif ( $opt{edit} ) {
     eval {
         if ( $new_timesheet ) {
             my $diff = $timesheet->diff($new_timesheet);
-            $backend->add_timesheet($diff);
+            $backend->add_timesheet($diff, 1);
             ts_print($new_timesheet);
         }
         else {
