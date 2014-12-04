@@ -19,7 +19,7 @@ sub downloadFromTksweb {
     print "Committing for $date\n" if -t 1;
  
     my $url = "https://tksweb.catalyst.net.nz/export/catalyst/$date.tks";
-    my $cmd = "wget -q -O - --post-data='api-key=$apikey' $url > $dir/$date.tks";
+    my $cmd = "wget -q --no-check-certificate -O - --post-data='api-key=$apikey' $url > $dir/$date.tks";
  
     system($cmd);
 }
