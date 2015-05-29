@@ -48,7 +48,7 @@ sub html2text {
             # print "$row, $col:  $val=\n";
 
             # Hack for nice hours formatting
-            if ($val =~ /\d+\.\d+/){
+            if ($val =~ /^\d+\.\d+$/){
                 $val = sprintf('%.2f', $val * 1);
                 $val = sprintf('%7s', $val);
             } elsif ($val =~ /^\d+$/){
@@ -161,6 +161,10 @@ sub html2text {
         }
         $text .= "\n";
     }
+
+    # Remove trailing whitespace on each line (shown as error in many vim setups)
+    $text =~ s/\s+\n/\n/g;
+
     return $text.$suffix;
 
 }
