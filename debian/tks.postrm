@@ -26,6 +26,10 @@ case "$1" in
         for dir in ftdetect ftplugin syntax; do
             [ -L /var/lib/vim/addons/$dir/tks.vim ] && rm /var/lib/vim/addons/$dir/tks.vim
         done
+
+        # Uninstall gtksourceview-3.0 language definition
+        [ -L /usr/share/gtksourceview-3.0/language-specs/tks.lang ] && rm /usr/share/gtksourceview-3.0/language-specs/tks.lang
+
     ;;
     remove)
     ;;

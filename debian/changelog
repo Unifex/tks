@@ -1,3 +1,9 @@
+tks (1.0.27) unstable; urgency=low
+
+  * Added gtksourceview language spec for TKS files.
+
+ -- Jonathan Harker <jonathan@catalyst.net.nz>  Fri, 30 Oct 2015 16:36:18 +1300
+
 tks (1.0.26) unstable; urgency=low
 
   * Don't check the SSL cert for tksweb

@@ -30,6 +30,9 @@ case "$1" in
             [ -L /var/lib/vim/addons/$dir/tks.vim ] || ln -fs /usr/share/tks/vim/$dir/tks.vim /var/lib/vim/addons/$dir/tks.vim
         done
 
+        # Install gtksourceview-3.0 language definition
+        [ -d /usr/share/gtksourceview-3.0/language-specs ] && ln -sf /usr/share/tks/gtksourceview-3.0/tks.lang /usr/share/gtksourceview-3.0/language-specs/tks.lang
+
         ;;
     abort-upgrade|abort-remove|abort-deconfigure)
         ;;

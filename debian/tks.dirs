@@ -2,4 +2,5 @@ usr/bin
 usr/share/perl5
 usr/share/tks
 usr/share/tks/vim
+usr/share/tks/gtksourceview-3.0
 usr/share/vim/registry
