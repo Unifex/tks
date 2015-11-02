@@ -10,7 +10,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	dh_clean
-	rm -f debian/tks.1 debian/tksrc.5 debian/hamster2tks.1 debian/git2tks.1  debian/rerun-timesheet.1 debian/tksweb-commit.1
+	rm -f debian/tks.1 debian/tksrc.5 debian/hamster2tks.1 debian/git2tks.1  debian/rerun-timesheet.1
 
 binary:
 	dh_testdir
@@ -21,10 +21,9 @@ binary:
 	pod2man --center="User Manuals" hamster2tks.pl > $(CURDIR)/debian/hamster2tks.1
 	pod2man --center="User Manuals" git2tks.pl > $(CURDIR)/debian/git2tks.1
 	pod2man --center="User Manuals" rerun-timesheet.pl > $(CURDIR)/debian/rerun-timesheet.1
-	pod2man --center="User Manuals" tksweb-commit.pl > $(CURDIR)/debian/tksweb-commit.1
 	pod2man --section 5 --center="File Formats" doc/tksrc.pod > $(CURDIR)/debian/tksrc.5
-	dh_installman debian/tks.1 debian/tksrc.5 debian/hamster2tks.1 debian/git2tks.1 debian/rerun-timesheet.1 debian/tksweb-commit.1
-	rm -f debian/tks.1 debian/tksrc.5 debian/hamster2tks.1 debian/git2tks.1 debian/rerun-timesheet.1 debian/tksweb-commit.1
+	dh_installman debian/tks.1 debian/tksrc.5 debian/hamster2tks.1 debian/git2tks.1 debian/rerun-timesheet.1
+	rm -f debian/tks.1 debian/tksrc.5 debian/hamster2tks.1 debian/git2tks.1 debian/rerun-timesheet.1
 	dh_compress
 	dh_fixperms
 

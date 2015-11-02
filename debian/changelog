@@ -1,3 +1,9 @@
+tks (1.0.28) unstable; urgency=low
+
+  * Saved query support (Brendan Heywood)
+
+ -- Matthew Hunt <matt@catalyst.net.nz>  Tue, 03 Nov 2015 11:07:16 +1300
+
 tks (1.0.27) unstable; urgency=low
 
   * Added gtksourceview language spec for TKS files.
