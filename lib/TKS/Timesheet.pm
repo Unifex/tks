@@ -523,9 +523,10 @@ sub as_string {
 }
 
 sub edit {
-    my ($self) = @_;
+    my ($self, $prelude) = @_;
 
     my $string = "# Edit this file to suit, then save and quit\n";
+    $string .= $prelude if $prelude;
     $string .= $self->as_string;
 
     my $timesheet;

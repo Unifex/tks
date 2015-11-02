@@ -16,6 +16,8 @@ use URI;
 use Term::ProgressBar;
 use POSIX;
 use Data::Dumper;
+use TKS::Table;
+use Term::ReadKey;
 
 $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
 
@@ -153,6 +155,22 @@ sub baseurl {
     $site .= '/' unless $site =~ m{ / \z }xms;
 
     return $site;
+}
+
+sub saved_search {
+    my ($self, $search, $maxrows) = @_;
+
+    my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+
+    $self->fetch_page("wrsearch.php?style=stripped&format=brief&saved_query=".$search);
+    my $html = $self->{mech}->content();
+    my $text = TKS::Table::html2text($html, $wchar-3, $maxrows+1); # Remove 3 chars to fit in vim line numbers
+
+    if (!$text){
+        return "#\n# Error: Saved query '$search' returned 0 rows\n#";
+    } else {
+        return $text;
+    }
 }
 
 sub user_search {

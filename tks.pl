@@ -32,7 +32,7 @@ use Term::ANSIColor;
 
 my(%opt);
 
-if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'quiet|q', 'dateformat|d=s')) {
+if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'quiet|q', 'dateformat|d=s', 'query=s', 'maxquery=i')) {
     pod2usage(-exitval => 1,  -verbose => 0);
 }
 
@@ -52,6 +52,8 @@ $opt{filename} = shift;
 $opt{section} ||= 'default';
 $opt{filter} ||= config($opt{section}, 'defaultfilter');
 $opt{extra} ||= config($opt{section}, 'extra');
+$opt{query} ||= config($opt{section}, 'query');
+$opt{maxquery} ||= config($opt{section}, 'maxquery');
 delete $opt{filter} if $opt{filter} and $opt{filter} eq 'all';
 
 # quiet mode is only supported when using commit mode (for use from cron)
@@ -95,12 +97,23 @@ elsif ( $opt{edit} ) {
         pod2usage(-verbose => 0, -exitval => 1, -message => "using --list with a filename is not supported");
     }
     my $timesheet = $backend->get_timesheet(TKS::Date->new($opt{edit}));
-    my $new_timesheet = $timesheet->edit();
+
+    map {
+        $timesheet->addmentioneddate($_);
+    } TKS::Date->new($opt{edit})->dates;
+
+    my $prelude = '';
+    if ( $opt{query} ) {
+        my $maxrows = $opt{maxquery} || 15;
+        $prelude = $backend->saved_search( $opt{query}, $maxrows );
+    }
+
+    my $new_timesheet = $timesheet->edit($prelude);
 
     eval {
         if ( $new_timesheet ) {
             my $diff = $timesheet->diff($new_timesheet);
-            $backend->add_timesheet($diff);
+            $backend->add_timesheet($diff, 1);
             ts_print($new_timesheet);
         }
         else {
@@ -281,6 +294,20 @@ Lists timesheet entries for I<datespec> (output is a valid TKS file).
 
 Open your C<$EDITOR> with the entries for I<datespec>, 
 and after you've edited them, commit them to the system.
+
+=item B<-q>, B<--query>=I<savedquery>
+
+Only works with -e above. Shows a named 'saved query' from WRMS
+directly in your timesheet to quickly lookup WR numbers. You can
+specify this inside your .tksrc file like so:
+
+ [default]
+ query = Allocated
+ maxquery = 20
+
+=item B<--maxquery>=I<maxquery>
+
+Limits the number of items shown in a saved query. Defaults to 15
 
 =item B<-t>, B<--template>=I<datespec>
 
