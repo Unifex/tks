@@ -9,7 +9,6 @@
     <metadata>
         <property name="mimetypes">application/tks;text/tks;</property>
         <property name="globs">*.tks;*.tks.*</property>
-        <property name="line-comment-start">#</property>
     </metadata>
 
     <styles>
@@ -25,12 +24,11 @@
         <context id="tks">
             <include>
                 <context id="line-comment" style-ref="comment" end-at-line-end="true">
-                    <start>#</start>
+                    <start>^\s*#</start>
                 </context>
 
-                <context id="date" style-ref="keyword">
+                <context id="date" style-ref="keyword" end-at-line-end="true">
                     <start>^[0-9]{4}-[0-9]{2}-[0-9]{2}</start>
-                    <end>$</end>
                 </context>
 
                 <context id="wr" style-ref="variable">
