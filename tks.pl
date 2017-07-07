@@ -22,6 +22,9 @@ our $VERSION = '1.0.29';
 use strict;
 use warnings;
 
+use 5.010;
+
+use lib './lib/';
 use Pod::Usage;
 use Getopt::Long qw(GetOptions);
 use TKS::Timesheet;
@@ -367,6 +370,28 @@ and/or
 a mnemonic like 'yesterday'. 
 Consult the manpage for more information.
 (FIXME: This is the manpage, it needs more information added.)
+
+=item B<--request>=I<hours>
+
+=item B<--time>=I<hours>
+
+=item B<--comment>=I<hours>
+
+=item B<--weekend>
+
+These options modify the B<--template> option to populate each day with
+the provided details. Requires at least B<--request> and B<--time> to be
+specified.
+
+B<--comment> is optional and, if provided, will be used as the timesheet
+description for time entry.
+
+B<--weekend> if set, will include lines for Saturday and Sunday in the
+template. Default is to only include weekdays.
+
+B<NOTE:> tks does not automatically handle public holidays. You will need
+to edit the template to remove these if they occur in the template date
+range.
 
 =head2 Datespecs
 
