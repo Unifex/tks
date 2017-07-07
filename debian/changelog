@@ -1,3 +1,9 @@
+tks (1.0.29) unstable; urgency=medium
+
+  * Add options for creating a pre-filled template.
+
+ -- Matthew Hunt <matt@catalyst.net.nz>  Fri, 07 Jul 2017 14:07:18 +1200
+
 tks (1.0.28) unstable; urgency=low
 
   * Saved query support (Brendan Heywood)

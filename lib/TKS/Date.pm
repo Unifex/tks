@@ -8,7 +8,7 @@ use warnings;
 use POSIX;
 use List::Util qw(maxstr minstr);
 use List::MoreUtils qw(uniq);
-use Date::Calc qw(Add_Delta_Days Add_Delta_YM Days_in_Month Mktime);
+use Date::Calc qw(Add_Delta_Days Add_Delta_YM Days_in_Month Mktime Day_of_Week);
 use UNIVERSAL;
 
 my %month_for;
@@ -107,6 +107,26 @@ sub parse_datespec {
     }
 
     return uniq(sort(@dates));
+}
+
+sub filter {
+    my ($self, $dates, $filter) = @_;
+
+    return () unless ref($dates) eq 'ARRAY';
+    return @$dates unless ref($filter) eq 'HASH';
+
+    my @filtered_dates = ();
+    my @days = @{$filter->{'days'}};
+
+    foreach my $date ( @$dates ) {
+        my ($year, $month, $day) = $self->_date_parts($date);
+        my $dow = Day_of_Week($year, $month, $day);
+        if (grep $_ == $dow, @days) {
+             push @filtered_dates, $date;
+        }
+    }
+
+    return @filtered_dates;
 }
 
 sub _make_range {

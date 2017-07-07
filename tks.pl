@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-our $VERSION = '1.0.28';
+our $VERSION = '1.0.29';
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ use Term::ANSIColor;
 
 my(%opt);
 
-if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'quiet|q', 'dateformat|d=s', 'query=s', 'maxquery=i')) {
+if(!GetOptions(\%opt, 'help|?', 'version', 'extra', 'section|s=s', 'list|l=s', 'edit|e=s', 'commit|c', 'no-color', 'user|u=s', 'filter|f=s', 'force', 'template|t=s', 'time=i', 'request=i', 'comment=s', 'weekend', 'quiet|q', 'dateformat|d=s', 'query=s', 'maxquery=i')) {
     pod2usage(-exitval => 1,  -verbose => 0);
 }
 
@@ -46,6 +46,12 @@ elsif ($opt{dateformat} && $opt{dateformat} !~ m/^(YMD|DMY|MDY|DMonY)$/)
     print "Invalid date format selected.\nValid formats are YMD, DMY, MDY and DMonY\n";
     exit 0;
 }
+elsif ($opt{template} && (($opt{request} && !$opt{time}) || ($opt{time} && !$opt{request})) ) {
+    print "For template mode, request and time must both be specified together.\n\n";
+    print "tks.pl --time=8 --request=2755808 -t 2017-08-01..2017-08-31\n";
+    exit 0;
+}
+
 
 $opt{filename} = shift;
 
@@ -75,14 +81,25 @@ if ( config($opt{section}, 'case-insensitive') ) {
 my $color_on = ( -t STDOUT and not $opt{'no-color'} );
 if ( $opt{template} ) {
     my $timesheet = TKS::Timesheet->new();
+    my $request = $opt{request} || '-';
+    my $time    = $opt{time} || 0;
+    my $comment = $opt{'comment'} || '';
+    if ($request eq '-' && $time == 0) {
+        $comment = '';
+    }
+    my $weekend = $opt{'weekend'};
+    my @dates = TKS::Date->new($opt{template})->dates;
+    unless ($weekend) {
+        @dates = TKS::Date->filter(\@dates, {'days',  [1,2,3,4,5]});
+    }
     map {
         $timesheet->addentry(TKS::Entry->new(
             date => $_,
-            time => 0,
-            request => '-',
-            comment => '',
+            time => $time,
+            request => $request,
+            comment => $comment,
         ));
-    } TKS::Date->new($opt{template})->dates;
+    } @dates;
     ts_print($timesheet);
 }
 elsif ( $opt{list} ) {
@@ -315,6 +332,32 @@ Prints an "empty" timesheet to the standard output
 (i.e., just a list of dates in the correct format matching the supplied
 I<datespec>).
 
+=item B<--request>=I<number>
+
+=item B<--time>=I<hours>
+
+=item B<--comment>=I<text>
+
+=item B<--weekend>
+
+These options modify the B<--template> option to populate each day with
+the provided details. Requires at least B<--request> and B<--time> to be
+specified.
+
+B<--request> provides the request number to be used for all entries.
+
+B<--time> provides the number of hours to be recorded for all entries.
+
+B<--comment> is optional and, if provided, will be used as the timesheet
+description for time entry.
+
+B<--weekend> if set, will include lines for Saturday and Sunday in the
+template. Default is to only include weekdays.
+
+B<NOTE:> tks does not automatically handle public holidays. You will need
+to edit the template to remove these if they occur in the template date
+range.
+
 =back
 
 I<datespec> can be many things: 
@@ -427,6 +470,10 @@ Edit the time recorded in system 'foo' on 2009/05/25:
 Output all time recorded in the default system from last week and today:
 
     tks -l lastweek,today
+
+Create a template file for a month of annual leave next month:
+
+    tks -t nextmonth --request=12345 --time=8 --comment='Annual leave'
 
 =head1 BUGS
 
