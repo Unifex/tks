@@ -33,6 +33,7 @@ binary:
 	dh_install
 
 	cp $(CURDIR)/tks.pl $(CURDIR)/debian/tks/usr/bin/tks
+	cp $(CURDIR)/tks-weekly-prep.pl $(CURDIR)/debian/tks/usr/bin/tks-weekly-prep
 	cp $(CURDIR)/hamster2tks.pl $(CURDIR)/debian/tks/usr/bin/hamster2tks
 	cp $(CURDIR)/git2tks.pl $(CURDIR)/debian/tks/usr/bin/git2tks
 	cp $(CURDIR)/rerun-timesheet.pl $(CURDIR)/debian/tks/usr/bin/rerun-timesheet
