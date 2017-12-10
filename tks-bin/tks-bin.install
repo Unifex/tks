@@ -1,0 +1,29 @@
+post_install() {
+    # Install vim plugin
+    for dir in ftdetect ftplugin syntax
+    do
+        # Ensure required vim plugin dirs exist
+        [ -d /usr/share/vim/vimfiles/$dir ] || mkdir /usr/share/vim/vimfiles/$dir
+
+        [ -L /usr/share/vim/vimfiles/$dir/tks.vim ] || ln -fs /usr/share/tks/vim/$dir/tks.vim /usr/share/vim/vimfiles/$dir/tks.vim
+    done
+
+    # Install gtksourceview-3.0 language definition
+    [ -d /usr/share/gtksourceview-3.0/language-specs ] && ln -sf /usr/share/tks/gtksourceview-3.0/tks.lang /usr/share/gtksourceview-3.0/language-specs/tks.lang
+
+}
+
+post_remove() {
+    # Uninstall vim plugin
+    for dir in ftdetect ftplugin syntax
+    do
+        [ -L /usr/share/vim/vimfiles/$dir/tks.vim ] && rm /usr/share/vim/vimfiles/$dir/tks.vim
+    done
+
+    # Uninstall gtksourceview-3.0 language definition
+    [ -L /usr/share/gtksourceview-3.0/language-specs/tks.lang ] && rm /usr/share/gtksourceview-3.0/language-specs/tks.lang
+}
+
+post_upgrade() {
+	post_install
+}

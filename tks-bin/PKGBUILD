@@ -1,0 +1,35 @@
+# Maintainer: victorengmark@catalyst.net.nz
+pkgname=tks-bin
+pkgver=1.0.29
+pkgrel=1
+pkgdesc="Reduces the overhead of time tracking for WRMS. Now you can record your timesheets in a simple, readable format, and run a script to send the data to WRMS. No more dealing with that pesky web interface."
+arch=('any')
+url="http://wiki.wgtn.cat-it.co.nz/wiki/TKS"
+license=('GPL3')
+groups=('')
+depends=(
+    libconfig
+    perl-crypt-ssleay
+    perl-date-calc
+    perl-dbd-sqlite
+    perl-ipc-system-simple
+    perl-json
+    perl-list-moreutils
+    perl-moo
+    perl-term-progressbar
+    perl-term-readkey
+    perl-term-readline-gnu
+    perl-www-mechanize
+    perl-xml-libxml
+)
+options=('!strip' '!emptydirs')
+source=('http://debian.catalyst.net.nz/catalyst/dists/stable/catalyst/binary-amd64/tks_1.0.29_all.deb')
+sha512sums=('d288d12056529c73f8d2c2dc760fcb9ec7ca1c5e192ea63dc094382be756e273aca041b2645fb82039fe2adfdca0a3b7d1088ae74abf8c65d97825741f251690')
+install=tks-bin.install
+
+package() {
+	# Extract package data
+	tar xf data.tar.xz -C "${pkgdir}"
+
+	install -D -m644 "../../debian/copyright" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
