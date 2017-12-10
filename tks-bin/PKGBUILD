@@ -31,5 +31,8 @@ package() {
 	# Extract package data
 	tar xf data.tar.xz -C "${pkgdir}"
 
+	mkdir "${pkgdir}/usr/share/perl5/vendor_perl"
+	mv "${pkgdir}/usr/share/perl5/TKS" "${pkgdir}/usr/share/perl5/vendor_perl/"
+
 	install -D -m644 "../../debian/copyright" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
